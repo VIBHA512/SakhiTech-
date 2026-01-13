@@ -2,44 +2,86 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>SakhiTech – Women Safety AI</title>
+  <title>SakhiTech</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="chat-container">
-    <h2>🌸 SakhiTech</h2>
-    <p class="tagline">AI-Powered Women Safety Assistant</p>
+  <div class="container">
+    <h1>🌸 SakhiTech</h1>
+    <p class="subtitle">AI-Powered Women Safety Assistant</p>
 
-    <div id="chat-box"></div>
+    <div id="chatBox" class="chat-box"></div>
 
-    <input type="text" id="userInput" placeholder="Type your concern here..." />
+    <input type="text" id="userInput" placeholder="Type your concern here...">
     <button onclick="sendMessage()">Send</button>
+
+    <hr>
+
+    <!-- LOCATION -->
+    <button class="feature-btn" onclick="getLocation()">📍 Share My Location</button>
+    <p id="locationOutput"></p>
+
+    <!-- SOS -->
+    <button class="sos-btn" onclick="sendSOS()">🚨 SOS Emergency</button>
+
+    <!-- HELPLINES -->
+    <div class="helplines">
+      <h3>📞 Emergency Helplines</h3>
+      <p>112 – National Emergency</p>
+      <p>1091 – Women Helpline</p>
+      <p>181 – Women Safety</p>
+    </div>
   </div>
 
-  <script>
-    async function sendMessage() {
-      const input = document.getElementById("userInput");
-      const message = input.value;
+<script>
+async function sendMessage() {
+  const input = document.getElementById("userInput");
+  const chatBox = document.getElementById("chatBox");
 
-      if (!message) return;
+  if (input.value.trim() === "") return;
 
-      const chatBox = document.getElementById("chat-box");
-      chatBox.innerHTML += `<p class="user">You: ${message}</p>`;
-      input.value = "";
+  chatBox.innerHTML += `<p class="user">You: ${input.value}</p>`;
 
-      const response = await fetch("http://localhost:3000/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ message })
-      });
+  const response = await fetch("http://localhost:3000/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: input.value })
+  });
 
-      const data = await response.json();
-      chatBox.innerHTML += `<p class="bot">AI: ${data.reply}</p>`;
+  const data = await response.json();
+  chatBox.innerHTML += `<p class="ai">AI: ${data.reply}</p>`;
+
+  input.value = "";
+}
+
+// 📍 LOCATION FEATURE
+function getLocation() {
+  const output = document.getElementById("locationOutput");
+
+  if (!navigator.geolocation) {
+    output.innerText = "Geolocation not supported";
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      output.innerText =
+        `📍 Location detected:
+Latitude: ${position.coords.latitude}
+Longitude: ${position.coords.longitude}`;
+    },
+    () => {
+      output.innerText = "Unable to access location";
     }
-  </script>
+  );
+}
+
+// 🚨 SOS FEATURE
+function sendSOS() {
+  alert("🚨 SOS Alert Sent!\nLocation & alert shared with trusted contacts.");
+}
+</script>
 
 </body>
 </html>

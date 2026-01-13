@@ -1,85 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>SakhiTech</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<meta charset="UTF-8">
+<title>SakhiTech – Women Safety</title>
 
-  <div class="container">
-    <h1>🌸 SakhiTech</h1>
-    <p class="subtitle">AI-Powered Women Safety Assistant</p>
-
-    <div id="chatBox" class="chat-box"></div>
-
-    <input type="text" id="userInput" placeholder="Type your concern here...">
-    <button onclick="sendMessage()">Send</button>
-
-    <hr>
-
-    <!-- LOCATION -->
-    <button class="feature-btn" onclick="getLocation()">📍 Share My Location</button>
-    <p id="locationOutput"></p>
-
-    <!-- SOS -->
-    <button class="sos-btn" onclick="sendSOS()">🚨 SOS Emergency</button>
-
-    <!-- HELPLINES -->
-    <div class="helplines">
-      <h3>📞 Emergency Helplines</h3>
-      <p>112 – National Emergency</p>
-      <p>1091 – Women Helpline</p>
-      <p>181 – Women Safety</p>
-    </div>
-  </div>
-
-<script>
-async function sendMessage() {
-  const input = document.getElementById("userInput");
-  const chatBox = document.getElementById("chatBox");
-
-  if (input.value.trim() === "") return;
-
-  chatBox.innerHTML += `<p class="user">You: ${input.value}</p>`;
-
-  const response = await fetch("http://localhost:3000/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: input.value })
-  });
-
-  const data = await response.json();
-  chatBox.innerHTML += `<p class="ai">AI: ${data.reply}</p>`;
-
-  input.value = "";
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f3e8ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
-// 📍 LOCATION FEATURE
-function getLocation() {
-  const output = document.getElementById("locationOutput");
+.card {
+  background: white;
+  padding: 20px;
+  width: 360px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+  text-align: center;
+}
 
-  if (!navigator.geolocation) {
-    output.innerText = "Geolocation not supported";
-    return;
+.logo {
+  width: 120px;
+  margin-bottom: 10px;
+}
+
+h2 {
+  color: #7c3aed;
+}
+
+.chat {
+  border: 1px solid #ddd;
+  height: 170px;
+  padding: 10px;
+  overflow-y: auto;
+  margin: 10px 0;
+  background: #faf5ff;
+  border-radius: 8px;
+  text-align: left;
+}
+
+input {
+  width: 75%;
+  padding: 6px;
+}
+
+button {
+  padding: 6px 10px;
+  background: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.actions button {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.sos {
+  background: red;
+  font-weight: bold;
+}
+
+.stop {
+  background: black;
+}
+
+.helpline {
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: left;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <img src="C:\Users\punya\Downloads\WhatsApp_Image_2026-01-12_at_10.12.48_PM-removebg-preview.png" class="logo" alt="Logo">
+
+  <h2>SakhiTech</h2>
+  <p>AI-Powered Women Safety Assistant</p>
+
+  <div class="chat" id="chat">
+    <p><b>AI:</b> Hello 💜 I’m SakhiTech. How can I help you?</p>
+  </div>
+
+  <input id="msg" placeholder="Type your concern..." />
+  <button onclick="send()">Send</button>
+
+  <div class="actions">
+    <button onclick="getLocation()">📍 Share My Location</button>
+    <button class="sos" onclick="sendSOS()">🚨 SOS Emergency</button>
+    <button class="stop" onclick="stopSOS()">🛑 Stop Alarm</button>
+  </div>
+
+  <div class="helpline">
+    📞 Emergency Numbers:<br>
+    Police: 112<br>
+    Women Helpline: 181<br>
+    Ambulance: 108
+  </div>
+</div>
+
+<script>
+let sosSound;
+
+// CHAT
+function send() {
+  const chat = document.getElementById("chat");
+  const input = document.getElementById("msg");
+  const msg = input.value.trim();
+
+  if (msg === "") return;
+
+  chat.innerHTML += `<p><b>You:</b> ${msg}</p>`;
+
+  let reply = "I’m listening. Please tell me more.";
+  const text = msg.toLowerCase();
+
+  if (text.includes("help") || text.includes("unsafe") || text.includes("scared")) {
+    reply = "I’m here with you 💜 Press SOS 🚨 if you feel in danger.";
+  } else if (text.includes("alone")) {
+    reply = "You are not alone. Would you like to share your location?";
+  } else if (text.includes("follow") || text.includes("harass")) {
+    reply = "Move to a safe, crowded place and contact emergency services.";
+  } else if (text.includes("hello") || text.includes("hi")) {
+    reply = "Hello 💜 How can I help you today?";
   }
 
+  chat.innerHTML += `<p style="color:green;"><b>AI:</b> ${reply}</p>`;
+  input.value = "";
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// LOCATION
+function getLocation() {
+  const chat = document.getElementById("chat");
+
   navigator.geolocation.getCurrentPosition(
-    (position) => {
-      output.innerText =
-        `📍 Location detected:
-Latitude: ${position.coords.latitude}
-Longitude: ${position.coords.longitude}`;
+    pos => {
+      chat.innerHTML += `<p><b>You:</b> 📍 Shared my location</p>`;
+      chat.innerHTML += `
+        <p style="color:green;">
+          <b>AI:</b> Location received<br>
+          Lat: ${pos.coords.latitude}<br>
+          Long: ${pos.coords.longitude}
+        </p>`;
+      chat.scrollTop = chat.scrollHeight;
     },
     () => {
-      output.innerText = "Unable to access location";
+      chat.innerHTML += `<p style="color:red;"><b>AI:</b> Location denied.</p>`;
     }
   );
 }
 
-// 🚨 SOS FEATURE
+// SOS
 function sendSOS() {
-  alert("🚨 SOS Alert Sent!\nLocation & alert shared with trusted contacts.");
+  sosSound = new Audio("sos.mp3");
+  sosSound.loop = true;
+  sosSound.play();
+
+  const chat = document.getElementById("chat");
+  chat.innerHTML += `<p style="color:red;"><b>AI:</b> 🚨 SOS ACTIVATED!</p>`;
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// STOP SOS
+function stopSOS() {
+  if (sosSound) {
+    sosSound.pause();
+    sosSound.currentTime = 0;
+  }
 }
 </script>
 

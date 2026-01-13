@@ -109,7 +109,14 @@ button {
 </div>
 
 <script>
-let sosSound;
+let sosSound = new Audio("./sos.mp3");
+sosSound.loop = true;
+
+// unlock sound on first user interaction (mobile fix)
+document.addEventListener("click", () => {
+  sosSound.load();
+}, { once: true });
+
 
 // CHAT
 function send() {
@@ -162,14 +169,15 @@ function getLocation() {
 
 // SOS
 function sendSOS() {
-  sosSound = new Audio("./sos.mp3");
-  sosSound.loop = true;
-  sosSound.play();
+  sosSound.play().catch(() => {
+    alert("🔊 Tap once on the screen, then press SOS again");
+  });
 
   const chat = document.getElementById("chat");
-  chat.innerHTML += `<p style="color:red;"><b>AI:</b> 🚨 SOS ACTIVATED!</p>`;
+  chat.innerHTML += `<p style="color:red;"><b>AI:</b> 🚨 SOS ACTIVATED! Loud alarm started.</p>`;
   chat.scrollTop = chat.scrollHeight;
 }
+
 
 // STOP SOS
 function stopSOS() {
